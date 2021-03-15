@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="primary" dark v-if="!isChartsMulti && false">
       <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
@@ -36,11 +36,13 @@
     <v-main>
       <v-container fluid grid-list-xs>
         <v-row>
-          <v-col sm="3"> <stocks-filtered></stocks-filtered> </v-col>
-          <v-col sm="9">
+          <v-col sm="3" v-if="!isChartsMulti">
+            <stocks-filtered></stocks-filtered>
+          </v-col>
+          <v-col :sm="{ 9: !isChartsMulti }">
             <v-container grid-list-xs fluid>
               <v-row>
-                <v-col><filter-tab></filter-tab> </v-col>
+                <v-col v-if="!isChartsMulti"><filter-tab></filter-tab> </v-col>
               </v-row>
               <v-row>
                 <v-col>
@@ -72,7 +74,16 @@ export default {
   },
 
   data: () => ({
-    //
+    isChartsMulti: false,
   }),
+  watch: {
+    "$route.path": {
+      immediate: true,
+      deep: true,
+      handler: function (value) {
+        this.isChartsMulti = value === "/charts-multi";
+      },
+    },
+  },
 };
 </script>
