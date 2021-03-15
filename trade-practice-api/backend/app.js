@@ -31,6 +31,7 @@ app.get("/health", (req, res) => {
 });
 
 app.get("/chartData", routeService.getChartData);
+app.get("/getStocks", routeService.getStocks);
 
 // Create port
 const port = process.env.PORT || 4000;

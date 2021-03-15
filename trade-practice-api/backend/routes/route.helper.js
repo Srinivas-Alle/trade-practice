@@ -9,6 +9,11 @@ const getChartData = (req, res) => {
     message: "Invalid time",
   });
 };
+
+const getStocks = (req, res) => {
+  return chartService.getStocksMatchingCriteria(req, res);
+};
 module.exports = {
   getChartData,
+  getStocks,
 };

@@ -1,14 +1,24 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Home from "../views/chart-home/Home.vue";
+import Chart from "../views/chart-home/chart.vue";
+import ChartsMulti from "../views/charts-multi/charts-multi.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home,
+    name: "Chart",
+    component: Chart,
+  },
+  {
+    path: "/chart",
+    component: Chart,
+  },
+  {
+    path: "/charts-multi",
+    name: "ChartsMulti",
+    component: ChartsMulti,
   },
   {
     path: "/about",

@@ -1,6 +1,5 @@
 <template>
   <div class="hello">
-    {{ msg }}dd
     <!-- <highcharts :options="chartOptions"></highcharts> -->
     <highcharts
       class="stock"
@@ -15,9 +14,10 @@ import Highcharts from "highcharts";
 import stockInit from "highcharts/modules/stock";
 stockInit(Highcharts);
 export default {
-  name: "HelloWorld",
+  name: "chart",
   props: {
     msg: String,
+    time: Number,
   },
   data() {
     return {
