@@ -1,6 +1,36 @@
+const elastic = require("../elastic");
 const get15minsChartData = (req, res) => {
-  res.send({
-    timeFrame: "15mins",
+  const token = req.query["token"];
+  let from = req.query["from"];
+  from = from.replace("0530", "").trim();
+  const query = {
+    size: 1000,
+    query: {
+      bool: {
+        must: [
+          {
+            match: {
+              instrument_token: token,
+            },
+          },
+          {
+            range: {
+              time: {
+                gte: from,
+              },
+            },
+          },
+        ],
+      },
+    },
+  };
+
+  elastic.search(query, "ticks_10minute").then((response) => {
+    response = response.map((obj, index) => {
+      obj._source.time = new Date(obj._source.time).getTime();
+      return obj._source;
+    });
+    res.send(response);
   });
 };
 
@@ -16,39 +46,25 @@ const get30minsChartData = (req, res) => {
   });
 };
 const getStocksMatchingCriteria = (req, res) => {
-  const from = req.query["from"];
-  const to = req.query["to"];
-  console.log(from, to);
-  res.send([
-    {
-      name: "apple",
-      tick: "APL",
-      from,
-      to,
-      signalType: "L",
+  const query = {
+    size: 200,
+    query: {
+      range: {
+        time: {
+          gte: "2020-08-03T09:15:00+0530",
+          lte: "2020-08-03T09:15:00+0530",
+        },
+      },
     },
-    {
-      name: "Infosys",
-      tick: "infy",
-      from,
-      to,
-      signalType: "S",
-    },
-    {
-      name: "apple1",
-      tick: "APL",
-      from,
-      to,
-      signalType: "L",
-    },
-    {
-      name: "Infosys2",
-      tick: "infy",
-      from,
-      to,
-      signalType: "S",
-    },
-  ]);
+  };
+  elastic.search(query, "ticks_10minute").then((response) => {
+    response = response.map((obj, index) => {
+      obj._source.name = ++index + " " + obj._source.name;
+      return obj._source;
+    });
+    console.log(response);
+    res.send(response);
+  });
 };
 module.exports = {
   get15minsChartData,

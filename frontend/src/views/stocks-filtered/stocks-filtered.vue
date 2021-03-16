@@ -29,7 +29,7 @@ export default {
     return {
       totalStocks: [],
       visibleStocks: [],
-      pageSize: 10,
+      pageSize: 12,
       length: 1,
       page: 1,
     };
@@ -40,9 +40,9 @@ export default {
   computed: {},
   methods: {
     showStocksOfPage(page) {
-      if (this.totalStocks.length < page * this.pageSize) return;
+      if (this.totalStocks.length < page - 1 * this.pageSize) return;
       this.visibleStocks = this.totalStocks.slice(
-        page * this.pageSize - 1,
+        (page - 1) * this.pageSize,
         page * this.pageSize
       );
     },
@@ -57,8 +57,9 @@ export default {
       this.$router.push({
         path: "/chart",
         query: {
-          name: stock.tick,
-          time: "15minutes",
+          token: stock.instrument_token,
+          timeFrame: "15minutes",
+          from: stock.time,
         },
       });
     },

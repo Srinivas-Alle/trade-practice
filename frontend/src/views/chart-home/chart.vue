@@ -2,6 +2,7 @@
   <div class="hello">
     <!-- <highcharts :options="chartOptions"></highcharts> -->
     <highcharts
+      style="height: 600px"
       class="stock"
       :constructor-type="'stockChart'"
       :options="stockOptions"
@@ -10,9 +11,8 @@
 </template>
 
 <script>
-import Highcharts from "highcharts";
-import stockInit from "highcharts/modules/stock";
-stockInit(Highcharts);
+import chartService from "../chart-home/chart.service";
+
 export default {
   name: "chart",
   props: {
@@ -21,158 +21,186 @@ export default {
   },
   data() {
     return {
-      chartOptions: {
-        series: [
-          {
-            data: [1, 2, 3], // sample data
-          },
-        ],
-      },
       stockOptions: {
         rangeSelector: {
+          buttons: [
+            {
+              type: "hour",
+              count: 1,
+              text: "1h",
+            },
+            {
+              type: "day",
+              count: 1,
+              text: "1D",
+            },
+            {
+              type: "all",
+              count: 1,
+              text: "All",
+            },
+          ],
           selected: 1,
+          inputEnabled: false,
         },
-        title: {
-          text: "AAPL Stock Price",
-        },
-        series: [
+        yAxis: [
           {
-            name: "AAPL",
-            data: [10, 20, 10, 23, 65, 121, 44, 66, 98, 30, 32, 56, 25, 12, 53],
-            pointStart: Date.UTC(2018, 1, 1),
-            pointInterval: 1000 * 3600 * 24,
-            tooltip: {
-              valueDecimals: 2,
+            labels: {
+              align: "right",
+              x: -3,
+            },
+            title: {
+              text: "OHLC",
+            },
+            height: "60%",
+            lineWidth: 2,
+            resize: {
+              enabled: true,
             },
           },
+          {
+            labels: {
+              align: "right",
+              x: -3,
+            },
+            title: {
+              text: "Volume",
+            },
+            top: "62%",
+            height: "20%",
+            offset: 0,
+            lineWidth: 2,
+          },
         ],
+        plotOptions: {
+          candlestick: {
+            color: "red",
+            upColor: "green",
+          },
+        },
+        tooltip: {
+          split: true,
+        },
       },
     };
   },
-  mounted() {
-    // this.getChartData();
-  },
+  mounted() {},
   methods: {
-    getChartData() {
-      this.$http
-        .get("https://demo-live-data.highcharts.com/aapl-ohlcv.json")
-        .then((data) => {
-          // split the data set into ohlc and volume
-          var ohlc = [],
-            volume = [],
-            dataLength = data.length,
-            // set the allowed units for data grouping
-            groupingUnits = [
-              [
-                "week", // unit name
-                [1], // allowed multiples
-              ],
-              ["month", [1, 2, 3, 4, 6]],
-            ],
-            i = 0;
+    prepareChart(data, timeFrame) {
+      var ohlc = [],
+        volume = [],
+        dataLength = data.length,
+        // set the allowed units for data grouping
 
-          for (i; i < dataLength; i += 1) {
-            ohlc.push([
-              data[i][0], // the date
-              data[i][1], // open
-              data[i][2], // high
-              data[i][3], // low
-              data[i][4], // close
-            ]);
+        i = 0;
 
-            volume.push([
-              data[i][0], // the date
-              data[i][5], // the volume
-            ]);
-          }
+      for (i; i < dataLength; i += 1) {
+        ohlc.push([
+          data[i]["time"], // the date
+          data[i]["open"], // open
+          data[i]["high"], // high
+          data[i]["low"], // low
+          data[i]["close"], // close
+        ]);
 
-          // create the chart
-          window.Highcharts.stockChart("container", {
-            rangeSelector: {
-              selected: 1,
+        volume.push([
+          data[i]["time"], // the date
+          data[i]["volume"], // the volume
+        ]);
+      }
+
+      // create the chart
+      this.stockOptions = {
+        rangeSelector: {
+          selected: 1,
+        },
+
+        title: {
+          text: `${data[0].name}-${timeFrame}`,
+        },
+
+        yAxis: [
+          {
+            labels: {
+              align: "right",
+              x: -3,
             },
-
             title: {
-              text: "AAPL Historical",
+              text: "OHLC",
             },
-
-            yAxis: [
-              {
-                labels: {
-                  align: "right",
-                  x: -3,
-                },
-                title: {
-                  text: "OHLC",
-                },
-                height: "60%",
-                lineWidth: 2,
-                resize: {
-                  enabled: true,
-                },
-              },
-              {
-                labels: {
-                  align: "right",
-                  x: -3,
-                },
-                title: {
-                  text: "Volume",
-                },
-                top: "65%",
-                height: "35%",
-                offset: 0,
-                lineWidth: 2,
-              },
-            ],
-
-            tooltip: {
-              split: true,
+            height: "60%",
+            lineWidth: 2,
+            resize: {
+              enabled: true,
             },
+          },
+          {
+            labels: {
+              align: "right",
+              x: -3,
+            },
+            title: {
+              text: "Volume",
+            },
+            top: "62%",
+            height: "33%",
+            offset: 0,
+            color: "red",
+            lineWidth: 2,
+          },
+        ],
 
-            series: [
-              {
-                type: "candlestick",
-                name: "AAPL",
-                data: ohlc,
-                dataGrouping: {
-                  units: groupingUnits,
-                },
-              },
-              {
-                type: "column",
-                name: "Volume",
-                data: volume,
-                yAxis: 1,
-                dataGrouping: {
-                  units: groupingUnits,
-                },
-              },
-            ],
-          });
-        });
+        tooltip: {
+          split: true,
+        },
+
+        series: [
+          {
+            type: "candlestick",
+            name: `${data[0].name}`,
+            data: ohlc,
+          },
+          {
+            type: "column",
+            name: "Volume",
+            data: volume,
+            yAxis: 1,
+          },
+        ],
+      };
+    },
+    getChartDataOf(token, timeFrame, from) {
+      if (!token) return;
+      console.log(token, timeFrame, from);
+      // let prom = undefined;
+      // if (timeFrame === "15minutes") {
+      //   prom = chartService.get15minData(token, from);
+      // } else if (timeFrame === "5minutes") {
+      //   prom = chartService.get5minData(token, from);
+      // } else {
+      //   prom = chartService.get30minData(token, from);
+      // }
+
+      chartService.getChartData(token, from, timeFrame).then((data) => {
+        this.prepareChart(data, timeFrame);
+      });
     },
   },
   components: {
     // highcharts: Highcharts,
+  },
+  watch: {
+    "$route.query": {
+      immediate: true,
+      deep: true,
+      handler: function ({ token, timeFrame, from }) {
+        this.getChartDataOf(token, timeFrame, from);
+      },
+    },
   },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 </style>

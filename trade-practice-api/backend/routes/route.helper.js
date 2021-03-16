@@ -1,7 +1,7 @@
 const chartService = require("../services/chart.service");
 
 const getChartData = (req, res) => {
-  const time = req.query["time"];
+  const time = req.query["timeFrame"];
   if (time === "15minutes") return chartService.get15minsChartData(req, res);
   if (time === "5minutes") return chartService.get5minsChartData(req, res);
   if (time === "30minutes") return chartService.get30minsChartData(req, res);

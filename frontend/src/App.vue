@@ -36,7 +36,7 @@
     <v-main>
       <v-container fluid grid-list-xs>
         <v-row>
-          <v-col sm="3" v-if="!isChartsMulti">
+          <v-col sm="3" v-if="!isChartsMulti" class="pa-0">
             <stocks-filtered></stocks-filtered>
           </v-col>
           <v-col :sm="{ 9: !isChartsMulti }">
@@ -45,7 +45,7 @@
                 <v-col v-if="!isChartsMulti"><filter-tab></filter-tab> </v-col>
               </v-row>
               <v-row>
-                <v-col>
+                <v-col class="pa-0">
                   <router-view />
                 </v-col>
               </v-row>

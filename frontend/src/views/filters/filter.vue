@@ -32,7 +32,7 @@ export default {
     showMulitpleCharts() {
       const { query } = this.$route;
       window.open(
-        `http://localhost:8080/charts-multi?name=${query.name}&time=5minutes,15minutes,30minutes`,
+        `http://localhost:8080/charts-multi?token=${query.token}&time=5minutes,15minutes,30minutes&from=${query.from}`,
         "_blank"
       );
     },
@@ -41,8 +41,9 @@ export default {
       this.$router.push({
         path: "/chart",
         query: {
-          name: query.name,
-          time: time.replaceAll(" ", ""),
+          token: query.token,
+          timeFrame: time.replaceAll(" ", ""),
+          from: query.from,
         },
       });
     },

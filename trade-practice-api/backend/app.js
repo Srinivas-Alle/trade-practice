@@ -2,6 +2,7 @@ let express = require("express"),
   cors = require("cors"),
   bodyParser = require("body-parser");
 let routeService = require("../backend/routes/route.helper");
+require("../backend/elastic");
 // Connect mongoDB
 // mongoose.connect(database.db, {
 //     useNewUrlParser: true,
@@ -24,8 +25,6 @@ app.use(
 );
 app.use(cors());
 
-// API
-// app.use('/api', studentAPI)
 app.get("/health", (req, res) => {
   res.send({ live: true });
 });
