@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Chart from "../views/chart-home/chart.vue";
+import ChartSolo from "../views/chart-solo/chart-solo.vue";
 import ChartsMulti from "../views/charts-multi/charts-multi.vue";
 
 Vue.use(VueRouter);
@@ -9,11 +9,11 @@ const routes = [
   {
     path: "/",
     name: "Chart",
-    component: Chart,
+    component: ChartSolo,
   },
   {
     path: "/chart",
-    component: Chart,
+    component: ChartSolo,
   },
   {
     path: "/charts-multi",

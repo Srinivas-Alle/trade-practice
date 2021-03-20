@@ -11,16 +11,19 @@
 </template>
 
 <script>
-import chartService from "../chart-home/chart.service";
+import chartService from "../chart-core/chart.service";
 
 export default {
   name: "chart",
   props: {
-    msg: String,
-    time: Number,
+    // token: String,
+    timeFrame: String,
+    // from: String,
   },
   data() {
     return {
+      token: undefined,
+      from: undefined,
       stockOptions: {
         rangeSelector: {
           buttons: [
@@ -86,6 +89,9 @@ export default {
   },
   mounted() {},
   methods: {
+    updateChart() {
+      this.getChartDataOf(this.token, this.timeFrame, this.from);
+    },
     prepareChart(data, timeFrame) {
       var ohlc = [],
         volume = [],
@@ -193,8 +199,10 @@ export default {
     "$route.query": {
       immediate: true,
       deep: true,
-      handler: function ({ token, timeFrame, from }) {
-        this.getChartDataOf(token, timeFrame, from);
+      handler: function ({ token, from }) {
+        this.token = token;
+        this.from = from;
+        this.updateChart();
       },
     },
   },
