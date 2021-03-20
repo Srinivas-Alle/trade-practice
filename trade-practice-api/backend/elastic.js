@@ -31,11 +31,17 @@ const search = (query, indexName) => {
           body: query,
         },
         (err, response) => {
-          if (err) {
-            console.log(err);
-            reject(err);
+          try {
+            if (err) {
+              console.log(err);
+              reject(err);
+            }
+            resolve(response.hits.hits);
+          } catch (e) {
+            reject(new Error("while geting resonse from elastic"));
+
+            console.error(e);
           }
-          resolve(response.hits.hits);
         }
       );
     });

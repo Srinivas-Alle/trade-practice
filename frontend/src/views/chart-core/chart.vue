@@ -187,9 +187,11 @@ export default {
       //   prom = chartService.get30minData(token, from);
       // }
 
-      chartService.getChartData(token, from, timeFrame).then((data) => {
-        this.prepareChart(data, timeFrame);
-      });
+      chartService
+        .getChartData(token, decodeURIComponent(from), timeFrame)
+        .then((data) => {
+          this.prepareChart(data, timeFrame);
+        });
     },
   },
   components: {
