@@ -38,7 +38,37 @@ const search = (query, indexName) => {
             }
             resolve(response.hits.hits);
           } catch (e) {
-            reject(new Error("while geting resonse from elastic"));
+            resolve([]);
+
+            console.error(e);
+          }
+        }
+      );
+    });
+  } catch (err) {
+    console.error(err);
+    reject();
+  }
+};
+
+const getAggregation = (query, indexName) => {
+  try {
+    return new Promise((resolve, reject) => {
+      if (!indexName) throw new Error("pass Index");
+      client.search(
+        {
+          index: indexName,
+          body: query,
+        },
+        (err, response) => {
+          try {
+            if (err) {
+              console.log(err);
+              reject(err);
+            }
+            resolve(response);
+          } catch (e) {
+            resolve([]);
 
             console.error(e);
           }
@@ -54,4 +84,5 @@ const search = (query, indexName) => {
 module.exports = {
   getElasticInstance,
   search,
+  getAggregation,
 };

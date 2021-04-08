@@ -21,9 +21,9 @@ export default {
   data() {
     return {
       items: [
-        { id: 5, label: "5 minutes" },
-        { id: 15, label: "15 minutes" },
-        { id: 5, label: "30 minutes" },
+        { id: "5minutes", label: "5 minutes" },
+        { id: "15minutes", label: "15 minutes" },
+        { id: "30minutes", label: "30 minutes" },
       ],
       value: undefined,
     };
@@ -50,6 +50,15 @@ export default {
           from: query.from,
         },
       });
+    },
+  },
+  watch: {
+    "$route.query.timeFrame": {
+      immediate: true,
+      deep: true,
+      handler: function (value) {
+        this.value = this.items.filter((item) => item.id === value)[0];
+      },
     },
   },
 };

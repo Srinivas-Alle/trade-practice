@@ -11,20 +11,22 @@
 </template>
 
 <script>
+import moment from "moment";
 import chartService from "../chart-core/chart.service";
 
 export default {
   name: "chart",
   props: {
-    // token: String,
     timeFrame: String,
-    // from: String,
   },
   data() {
     return {
       token: undefined,
       from: undefined,
       stockOptions: {
+        time: {
+          timezoneOffset: -(5 * 60 + 30),
+        },
         rangeSelector: {
           buttons: [
             {
@@ -38,12 +40,17 @@ export default {
               text: "1D",
             },
             {
+              type: "month",
+              count: 1,
+              text: "1M",
+            },
+            {
               type: "all",
               count: 1,
               text: "All",
             },
           ],
-          selected: 1,
+          selected: 2,
           inputEnabled: false,
         },
         yAxis: [
@@ -79,6 +86,8 @@ export default {
           candlestick: {
             color: "red",
             upColor: "green",
+            grouping: false,
+            shadow: false,
           },
         },
         tooltip: {
@@ -101,32 +110,62 @@ export default {
         i = 0;
 
       for (i; i < dataLength; i += 1) {
-        ohlc.push([
-          data[i]["time"], // the date
-          data[i]["open"], // open
-          data[i]["high"], // high
-          data[i]["low"], // low
-          data[i]["close"], // close
-        ]);
+        let open = data[i]["open"];
+        let close = data[i]["close"];
+        if (i === 10) {
+          ohlc.push({
+            x: data[i]["time"], // the date
+            open: data[i]["open"], // open
+            low: data[i]["low"], // low
+            close: data[i]["close"], // close
+            high: data[i]["high"], // high
+            color: "#000000",
+          });
+          volume.push({
+            x: data[i]["time"],
+            y: data[i]["volume"],
+            color: "#000000",
+          });
+        } else {
+          ohlc.push([
+            data[i]["time"], // the date
+            data[i]["open"], // open
+            data[i]["high"], // high
+            data[i]["low"], // low
+            data[i]["close"], // close
+          ]);
+          volume.push({
+            x: data[i]["time"],
+            y: data[i]["volume"],
+            color: open < close ? "green" : "red",
+          });
+        }
+        console.log(ohlc);
 
-        volume.push([
-          data[i]["time"], // the date
-          data[i]["volume"], // the volume
-        ]);
+        // volume.push([
+        //   data[i]["time"], // the date
+        //   data[i]["volume"], // the volume
+        // ]);
       }
 
       // create the chart
       this.stockOptions = {
+        ...this.stockOptions,
         rangeSelector: {
-          selected: 1,
+          selected: 2,
         },
 
         title: {
-          text: `${data[0].name}-${timeFrame}`,
+          text: `${data[0].name}  :${moment(data[0].time).format(
+            "YY-MM-DD"
+          )}- ${moment(data[data.length - 1].time).format(
+            "YY-MM-DD"
+          )}(${timeFrame})`,
         },
 
         yAxis: [
           {
+            crosshair: true,
             labels: {
               align: "right",
               x: -3,
@@ -139,6 +178,7 @@ export default {
             resize: {
               enabled: true,
             },
+            grouping: false,
           },
           {
             labels: {
@@ -153,6 +193,7 @@ export default {
             offset: 0,
             color: "red",
             lineWidth: 2,
+            grouping: false,
           },
         ],
 
@@ -165,12 +206,28 @@ export default {
             type: "candlestick",
             name: `${data[0].name}`,
             data: ohlc,
+            tooltip: {
+              valueDecimals: 2,
+              formatter: function () {
+                return (
+                  "The value for <b>" +
+                  this.x +
+                  "</b> is <b>" +
+                  this.y +
+                  "</b>, in series " +
+                  this.series.name
+                );
+              },
+            },
           },
           {
             type: "column",
             name: "Volume",
             data: volume,
             yAxis: 1,
+            tooltip: {
+              valueDecimals: 2,
+            },
           },
         ],
       };
@@ -178,14 +235,6 @@ export default {
     getChartDataOf(token, timeFrame, from) {
       if (!token) return;
       console.log(token, timeFrame, from);
-      // let prom = undefined;
-      // if (timeFrame === "15minutes") {
-      //   prom = chartService.get15minData(token, from);
-      // } else if (timeFrame === "5minutes") {
-      //   prom = chartService.get5minData(token, from);
-      // } else {
-      //   prom = chartService.get30minData(token, from);
-      // }
 
       chartService
         .getChartData(token, decodeURIComponent(from), timeFrame)
@@ -194,9 +243,7 @@ export default {
         });
     },
   },
-  components: {
-    // highcharts: Highcharts,
-  },
+  components: {},
   watch: {
     "$route.query": {
       immediate: true,
